@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,6 +44,28 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        return redirect()->intended('/dashboard');
+    }
+
+    /**
+     * Login page
+     *
+     * @return \Inertia\Response
+     */
+    public function login(): Response
+    {
+        return Inertia::render('Auth/Login');
+    }
+
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function authenticate(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+
+        $request->session()->regenerate();
 
         return redirect()->intended('/dashboard');
     }

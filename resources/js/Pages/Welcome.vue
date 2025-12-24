@@ -5,7 +5,10 @@
         Welcome to Auth System based on Laravel 12 + Inertia + Vue
       </h1>
       <div class="flex flex-col items-center justify-center gap-4">
-        <Link href="/signup" class="text-indigo-600 hover:underline">Sign Up</Link>
+        <div class="flex gap-4">
+            <Link href="/login" class="text-indigo-600 hover:underline">Log in</Link>
+            <Link href="/signup" class="text-indigo-600 hover:underline">Sign Up</Link>
+        </div>
       </div>
     </div>
   </div>
