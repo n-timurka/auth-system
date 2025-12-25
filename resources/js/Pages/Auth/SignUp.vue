@@ -8,7 +8,15 @@
                     <label class="block font-medium text-sm text-gray-700" for="name">
                         Name
                     </label>
-                    <input id="name" type="text" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full px-1 py-2" v-model="form.name" required autofocus autocomplete="name" />
+                    <Input 
+                        id="name" 
+                        type="text" 
+                        v-model="form.name" 
+                        required 
+                        autofocus 
+                        autocomplete="name"
+                        :error="form.errors.name"
+                    />
                     <div v-if="form.errors.name" class="text-red-600 text-sm mt-1">
                         {{ form.errors.name }}
                     </div>
@@ -18,7 +26,14 @@
                      <label class="block font-medium text-sm text-gray-700" for="email">
                         Email
                     </label>
-                    <input id="email" type="email" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full px-1 py-2" v-model="form.email" required autocomplete="username" />
+                    <Input 
+                        id="email" 
+                        type="email" 
+                        v-model="form.email" 
+                        required 
+                        autocomplete="username"
+                        :error="form.errors.email"
+                    />
                     <div v-if="form.errors.email" class="text-red-600 text-sm mt-1">{{ form.errors.email }}</div>
                 </div>
 
@@ -26,18 +41,28 @@
                      <label class="block font-medium text-sm text-gray-700" for="password">
                         Password
                     </label>
-                    <input id="password" type="password" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full px-1 py-2" v-model="form.password" required autocomplete="new-password" />
+                    <InputPassword 
+                        id="password" 
+                        v-model="form.password" 
+                        required 
+                        autocomplete="new-password"
+                        :error="form.errors.password"
+                    />
                      <div v-if="form.errors.password" class="text-red-600 text-sm mt-1">{{ form.errors.password }}</div>
                 </div>
 
                 <div class="flex items-center justify-end mt-8">
-                    <Link href="/login" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-4">
+                    <Link href="/login" variant="underline" class="text-sm mr-4">
                         Already registered?
                     </Link>
 
-                    <button class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    <Button 
+                        type="submit" 
+                        variant="primary" 
+                        :disabled="form.processing"
+                    >
                         Register
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>
@@ -45,7 +70,11 @@
 </template>
 
 <script setup>
-import { useForm, Link } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
+import Input from '@/Components/Input.vue';
+import InputPassword from '@/Components/InputPassword.vue';
+import Button from '@/Components/Button.vue';
+import Link from '@/Components/Link.vue';
 
 const form = useForm({
     name: '',
