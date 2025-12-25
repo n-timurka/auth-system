@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Permission;
+use App\Enums\Role;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
@@ -22,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -44,6 +47,29 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => Role::class,
         ];
+    }
+
+    /**
+     * Check if user has a specific permission
+     *
+     * @param Permission|string $permission
+     * @return bool
+     */
+    public function hasPermission(Permission|string $permission): bool
+    {
+        $permissionValue = $permission instanceof Permission ? $permission->value : $permission;
+        return in_array($permissionValue, $this->getPermissions());
+    }
+
+    /**
+     * Get all permissions for the user's role
+     *
+     * @return array<string>
+     */
+    public function getPermissions(): array
+    {
+        return Permission::forRole($this->role);
     }
 }

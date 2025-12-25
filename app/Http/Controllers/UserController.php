@@ -19,7 +19,7 @@ class UserController extends Controller
     {
         $users = User::withTrashed()->get();
 
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Users', [
             'users' => UserResource::collection($users)
         ]);
     }
