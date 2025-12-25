@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'is_remembered' => !empty($this->remember_token),
             'deleted_at' => $this->deleted_at,
         ];
     }

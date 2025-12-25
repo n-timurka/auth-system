@@ -29,6 +29,7 @@
                                         <tr>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remembered</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                         </tr>
@@ -37,6 +38,10 @@
                                         <tr v-for="u in users.data" :key="u.id">
                                             <td class="px-6 py-4 whitespace-nowrap">{{ u.name }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">{{ u.email }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span v-if="u.is_remembered" class="text-green-600 font-semibold">Yes</span>
+                                                <span v-else class="text-gray-500">No</span>
+                                            </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span v-if="u.deleted_at" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Deleted</span>
                                                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
