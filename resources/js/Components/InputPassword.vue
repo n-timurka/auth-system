@@ -3,8 +3,7 @@
         <input
             :id="id"
             :type="showPassword ? 'text' : 'password'"
-            :value="modelValue"
-            @input="$emit('update:modelValue', $event.target.value)"
+            v-model="value"
             :placeholder="placeholder"
             :required="required"
             :autofocus="autofocus"
@@ -35,11 +34,8 @@
 <script setup>
 import { ref } from 'vue';
 
+const value = defineModel('modelValue');
 defineProps({
-    modelValue: {
-        type: [String, Number],
-        default: '',
-    },
     id: {
         type: String,
         default: null,
@@ -69,8 +65,6 @@ defineProps({
         default: null,
     },
 });
-
-defineEmits(['update:modelValue']);
 
 const showPassword = ref(false);
 </script>

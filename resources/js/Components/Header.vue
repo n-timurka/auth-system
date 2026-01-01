@@ -17,12 +17,27 @@
                             Dashboard
                         </Link>
                         <Link 
+                            href="/channels" 
+                            class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition"
+                            :class="{ 'text-gray-900 bg-gray-100': $page.url === '/channels' }"
+                        >
+                            Channels
+                        </Link>
+                        <Link 
                             v-if="user?.permissions?.includes('users.view')"
                             href="/users" 
                             class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition"
                             :class="{ 'text-gray-900 bg-gray-100': $page.url === '/users' }"
                         >
                             Users
+                        </Link>
+                        <Link 
+                            v-if="user?.permissions?.includes('settings.view')"
+                            href="/settings" 
+                            class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition"
+                            :class="{ 'text-gray-900 bg-gray-100': $page.url === '/settings' }"
+                        >
+                            Settings
                         </Link>
                     </nav>
                 </div>

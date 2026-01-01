@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\SignupRequest;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,23 +31,19 @@ class AuthController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function store(Request $request): RedirectResponse
+    public function store(SignupRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
-
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
         Auth::login($user);
 
-        $user->sendEmailVerificationNotification();
+        if (SiteSetting::get('email_verification_enabled', true)) {
+            $user->sendEmailVerificationNotification();
+        }
 
         return redirect()->intended('/dashboard');
     }
@@ -57,7 +55,11 @@ class AuthController extends Controller
      */
     public function login(): Response
     {
-        return Inertia::render('Auth/Login');
+        $rememberMeEnabled = SiteSetting::get('remember_me_enabled', true);
+
+        return Inertia::render('Auth/Login', [
+            'rememberMeEnabled' => $rememberMeEnabled,
+        ]);
     }
 
     /**

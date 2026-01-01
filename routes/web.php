@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GoogleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -34,6 +36,14 @@ Route::middleware('auth')->group(function () {
         ->middleware('App\Http\Middleware\CheckPermission:users.restore')
         ->name('users.restore');
 
+    Route::get('/settings', [SettingController::class, 'index'])
+        ->middleware('App\Http\Middleware\CheckPermission:settings.view')
+        ->name('settings.index');
+
+    Route::put('/settings', [SettingController::class, 'update'])
+        ->middleware('App\Http\Middleware\CheckPermission:settings.edit')
+        ->name('settings.update');
+
     // Email Verification Routes
     Route::get('/email/verify/{id}/{hash}', function (Illuminate\Foundation\Auth\EmailVerificationRequest $request) {
         $request->fulfill();
@@ -46,4 +56,9 @@ Route::middleware('auth')->group(function () {
     })->middleware('throttle:6,1')->name('verification.send');
 
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
+
+    // Google Integration
+    Route::get('/channels', [GoogleController::class, 'index'])->name('channels.index');
+    Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 });

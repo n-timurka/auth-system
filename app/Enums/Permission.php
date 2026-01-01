@@ -9,6 +9,8 @@ enum Permission: string
     case USERS_EDIT = 'users.edit';
     case USERS_DELETE = 'users.delete';
     case USERS_RESTORE = 'users.restore';
+    case SETTINGS_VIEW = 'settings.view';
+    case SETTINGS_EDIT = 'settings.edit';
 
     /**
      * Get all permissions for a given role
@@ -25,6 +27,8 @@ enum Permission: string
                 self::USERS_EDIT->value,
                 self::USERS_DELETE->value,
                 self::USERS_RESTORE->value,
+                self::SETTINGS_VIEW->value,
+                self::SETTINGS_EDIT->value,
             ],
             Role::USER => [],
         };
