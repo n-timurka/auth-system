@@ -9,46 +9,46 @@
                         <Table>
                             <template #header>
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verified At</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remembered</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <TableHeader>Name</TableHeader>
+                                    <TableHeader>Email</TableHeader>
+                                    <TableHeader>Role</TableHeader>
+                                    <TableHeader>Created At</TableHeader>
+                                    <TableHeader>Verified At</TableHeader>
+                                    <TableHeader>Remembered</TableHeader>
+                                    <TableHeader>Status</TableHeader>
+                                    <TableHeader>Actions</TableHeader>
                                 </tr>
                             </template>
                             <tr v-for="u in users.data" :key="u.id">
-                                <td class="px-6 py-4 whitespace-nowrap">{{ u.name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ u.email }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <TableItem>{{ u.name }}</TableItem>
+                                <TableItem>{{ u.email }}</TableItem>
+                                <TableItem>
                                     <Badge :variant="u.role === 'admin' ? 'primary' : 'info'">
                                         {{ u.role }}
                                     </Badge>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ u.created_at || 'N/A' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                </TableItem>
+                                <TableItem>{{ u.created_at || 'N/A' }}</TableItem>
+                                <TableItem>
                                     <span v-if="u.email_verified_at" class="text-green-600">{{ u.email_verified_at }}</span>
                                     <span v-else class="text-yellow-600">Not verified</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                </TableItem>
+                                <TableItem>
                                     <span v-if="u.is_remembered" class="text-green-600 font-semibold">Yes</span>
                                     <span v-else class="text-gray-500">No</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                </TableItem>
+                                <TableItem>
                                     <Badge :variant="u.deleted_at ? 'danger' : 'success'">
                                         {{ u.deleted_at ? 'Deleted' : 'Active' }}
                                     </Badge>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                </TableItem>
+                                <TableItem>
                                     <Button v-if="!u.deleted_at" @click="deleteUser(u.id)" variant="danger" class="text-xs">
                                         Delete
                                     </Button>
                                     <Button v-else @click="restoreUser(u.id)" variant="secondary" class="text-xs">
                                         Restore
                                     </Button>
-                                </td>
+                                </TableItem>
                             </tr>
                         </Table>
                     </Card>
@@ -65,6 +65,8 @@ import Card from '@/Components/Card.vue';
 import Table from '@/Components/Table.vue';
 import Badge from '@/Components/Badge.vue';
 import Button from '@/Components/Button.vue';
+import TableHeader from '@/Components/TableHeader.vue';
+import TableItem from '@/Components/TableItem.vue';
 
 defineProps({
     users: Object,

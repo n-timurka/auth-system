@@ -5,12 +5,7 @@
         <main>
             <div class="py-12">
                 <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <Card>
-                        <div class="mb-6">
-                            <h2 class="text-2xl font-bold text-gray-800">Site Settings</h2>
-                            <p class="text-gray-600 mt-1">Manage your application settings</p>
-                        </div>
-
+                    <Card title="Site Settings" description="Manage your application settings">
                         <div v-if="successMessage" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
                             <p class="text-green-800 text-sm">{{ successMessage }}</p>
                         </div>
