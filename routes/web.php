@@ -65,6 +65,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/channels', [ChannelController::class, 'index'])->name('channels.index');
     Route::post('/channels', [ChannelController::class, 'store'])->name('channels.store');
     Route::post('/channels/{channel}/refresh', [ChannelController::class, 'refresh'])->name('channels.refresh');
+    Route::post('/channels/{channel}/sync-videos', [ChannelController::class, 'syncVideos'])->name('channels.syncVideos');
     Route::delete('/channels/{channel}', [ChannelController::class, 'destroy'])->name('channels.destroy');
     Route::get('/channels/{channel}', [ChannelController::class, 'show'])->name('channels.show');
+
+    // Videos
+    Route::get('/videos/{video}', [ChannelController::class, 'showVideo'])->name('videos.show');
+    Route::post('/videos/{video}/refresh', [ChannelController::class, 'refreshVideo'])->name('videos.refresh');
 });

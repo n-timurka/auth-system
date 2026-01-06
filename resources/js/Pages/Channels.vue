@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gray-100">
         <Header />
 
-        <main class="py-12">
+        <main class="py-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
                 
                 <!-- Personal Channel Section -->
@@ -16,7 +16,7 @@
                             Connect with Google
                         </a>
                     </div>
-                    <div v-else-if="!personalChannel" class="text-center py-8">
+                    <div v-else-if="!personalChannel" class="text-center">
                         <p class="text-gray-600 mb-6">Google account connected, but no personal YouTube channel has been linked yet.</p>
                         <button @click="addPersonalChannel" :disabled="formPersonal.processing" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                              <svg v-if="formPersonal.processing" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -62,8 +62,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <p class="text-gray-700 mb-6 whitespace-pre-wrap max-w-4xl text-sm line-clamp-3">{{ personalChannel.description }}</p>
                     </div>
                 </Card>
 

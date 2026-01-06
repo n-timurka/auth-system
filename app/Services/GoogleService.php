@@ -141,6 +141,93 @@ class GoogleService
         }
     }
 
+    public function fetchVideos(string $playlistId, ?string $pageToken = null)
+    {
+        try {
+            $client = $this->getClient();
+            if (!$client) {
+                return null;
+            }
+
+            $youtube = new YouTube($client);
+
+            $params = [
+                'playlistId' => $playlistId,
+                'maxResults' => 50, // Max allowed
+                'part' => 'snippet,contentDetails',
+            ];
+
+            if ($pageToken) {
+                $params['pageToken'] = $pageToken;
+            }
+
+            $playlistItemsResponse = $youtube->playlistItems->listPlaylistItems('snippet,contentDetails', $params);
+
+            $videos = [];
+            foreach ($playlistItemsResponse->items as $video) {
+                $videos[] = [
+                    'platform_video_id' => $video->contentDetails->videoId,
+                    'title' => $video->snippet->title,
+                    'description' => $video->snippet->description,
+                    'thumbnail_url' => $video->snippet->thumbnails->medium->url ?? $video->snippet->thumbnails->default->url ?? null,
+                    'published_at' => $video->snippet->publishedAt,
+                ];
+            }
+
+            return [
+                'videos' => $videos,
+                'nextPageToken' => $playlistItemsResponse->nextPageToken,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('YouTube API Error (fetchVideos): ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Fetch detailed video data (including statistics) by ID.
+     *
+     * @param string $videoId
+     * @return array|null
+     */
+    public function fetchVideoDetails(string $videoId)
+    {
+        try {
+            $client = $this->getClient();
+            if (!$client) {
+                return null;
+            }
+
+            $youtube = new YouTube($client);
+
+            $response = $youtube->videos->listVideos('snippet,statistics,contentDetails', [
+                'id' => $videoId
+            ]);
+
+            if (empty($response->items)) {
+                return null;
+            }
+
+            $video = $response->items[0];
+
+            return [
+                'platform_video_id' => $video->id,
+                'title' => $video->snippet->title,
+                'description' => $video->snippet->description,
+                'thumbnail_url' => $video->snippet->thumbnails->medium->url ?? $video->snippet->thumbnails->default->url ?? null,
+                'published_at' => $video->snippet->publishedAt,
+                'view_count' => $video->statistics->viewCount,
+                'like_count' => $video->statistics->likeCount,
+                'comment_count' => $video->statistics->commentCount,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('YouTube API Error (fetchVideoDetails): ' . $e->getMessage());
+            return null;
+        }
+    }
+
     /**
      * Fetch YouTube channel data using the access token (for current user).
      *
@@ -256,29 +343,17 @@ class GoogleService
             'thumbnails' => $channel->snippet->thumbnails,
             'statistics' => $channel->statistics,
             'contentDetails' => $channel->contentDetails,
-            'videos' => [],
+            'upload_playlist_id' => null,
         ];
 
         // Get Recent Videos (from uploads playlist)
         $uploadsPlaylistId = $channel->contentDetails->relatedPlaylists->uploads;
 
         if ($uploadsPlaylistId) {
-            $playlistItemsResponse = $youtube->playlistItems->listPlaylistItems('snippet,contentDetails', [
-                'playlistId' => $uploadsPlaylistId,
-                'maxResults' => 10
-            ]);
-
-            foreach ($playlistItemsResponse->items as $video) {
-                $channelData['videos'][] = [
-                    'id' => $video->contentDetails->videoId,
-                    'title' => $video->snippet->title,
-                    'description' => $video->snippet->description,
-                    'thumbnail' => $video->snippet->thumbnails->medium->url ?? $video->snippet->thumbnails->default->url,
-                    'publishedAt' => $video->snippet->publishedAt,
-                ];
-            }
+            $channelData['upload_playlist_id'] = $uploadsPlaylistId;
         }
 
         return $channelData;
     }
+
 }

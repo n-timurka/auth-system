@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use Illuminate\Http\Request;
+
 class ChannelController extends Controller
 {
     public function __construct(protected GoogleService $googleService)
@@ -95,7 +97,7 @@ class ChannelController extends Controller
                     'custom_url' => $channelData['customUrl'],
                     'thumbnail_url' => $channelData['thumbnails']->medium->url ?? $channelData['thumbnails']->default->url ?? null,
                     'statistics' => $channelData['statistics'],
-                    'videos' => $channelData['videos'],
+                    'upload_playlist_id' => $channelData['upload_playlist_id'] ?? null,
                     'published_at' => $channelData['publishedAt'],
                     'last_synced_at' => now(),
                 ]
@@ -117,13 +119,48 @@ class ChannelController extends Controller
      */
     public function show($platform_channel_id): Response
     {
-        $channel = Channel::where('platform_channel_id', $platform_channel_id)->firstOrFail();
+        $channel = Channel::where('platform_channel_id', $platform_channel_id)
+            ->with([
+                'videos' => function ($query) {
+                    $query->orderBy('published_at', 'desc');
+                }
+            ])
+            ->firstOrFail();
 
         return Inertia::render('Channel/Show', [
             'channel' => $channel
         ]);
     }
+    public function syncVideos(Channel $channel, Request $request)
+    {
+        if ($channel->type === 'personal' && $channel->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
+        if (!$channel->upload_playlist_id) {
+            return response()->json(['message' => 'No upload playlist found for this channel.'], 404);
+        }
+
+        $pageToken = $request->input('pageToken');
+        $result = $this->googleService->fetchVideos($channel->upload_playlist_id, $pageToken);
+
+        if (!$result) {
+            return response()->json(['message' => 'Failed to fetch videos from YouTube.'], 500);
+        }
+
+        foreach ($result['videos'] as $videoData) {
+            $channel->videos()->updateOrCreate(
+                ['platform_video_id' => $videoData['platform_video_id']],
+                $videoData
+            );
+        }
+
+        return response()->json([
+            'message' => 'Videos synced successfully.',
+            'videos' => $result['videos'],
+            'nextPageToken' => $result['nextPageToken'],
+        ]);
+    }
 
     /**
      * Refresh channel data
@@ -133,7 +170,7 @@ class ChannelController extends Controller
      */
     public function refresh(Channel $channel): RedirectResponse
     {
-        if ($channel->user_id !== Auth::id()) {
+        if ($channel->type === 'personal' && $channel->user_id !== Auth::id()) {
             return back()->withErrors(['message' => 'Unauthorized to refresh this channel.']);
         }
 
@@ -154,7 +191,7 @@ class ChannelController extends Controller
             'custom_url' => $newData['customUrl'],
             'thumbnail_url' => $newData['thumbnails']->medium->url ?? $newData['thumbnails']->default->url ?? null,
             'statistics' => $newData['statistics'],
-            'videos' => $newData['videos'],
+            'upload_playlist_id' => $newData['upload_playlist_id'] ?? $channel->upload_playlist_id,
             'last_synced_at' => now(),
         ]);
 
@@ -172,5 +209,42 @@ class ChannelController extends Controller
         $channel->delete();
 
         return back()->with('message', 'Channel deleted successfully.');
+    }
+
+    /**
+     * Show video details
+     * 
+     * @param \App\Models\Video $video
+     * @return Response
+     */
+    public function showVideo(\App\Models\Video $video): Response
+    {
+        return Inertia::render('Video/Show', [
+            'video' => $video,
+            'channel' => $video->channel
+        ]);
+    }
+
+    /**
+     * Refresh video data
+     * 
+     * @param \App\Models\Video $video
+     * @return RedirectResponse
+     */
+    public function refreshVideo(\App\Models\Video $video): RedirectResponse
+    {
+        // For personal channels, we might need to check ownership, but viewing/refreshing metadata 
+        // usually doesn't need strict ownership unless we want to restrict quota usage.
+        // Let's allow refreshing for now if the user is authenticated (which they are if they are here).
+
+        $newData = $this->googleService->fetchVideoDetails($video->platform_video_id);
+
+        if (!$newData) {
+            return back()->withErrors(['message' => 'Failed to refresh video data from YouTube.']);
+        }
+
+        $video->update($newData);
+
+        return back()->with('message', 'Video data refreshed.');
     }
 }

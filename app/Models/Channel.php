@@ -8,13 +8,13 @@ class Channel extends Model
 {
     protected $fillable = [
         'platform_channel_id',
+        'upload_playlist_id',
         'user_id',
         'name',
         'description',
         'custom_url',
         'thumbnail_url',
         'statistics',
-        'videos',
         'type',
         'published_at',
         'last_synced_at',
@@ -22,7 +22,6 @@ class Channel extends Model
 
     protected $casts = [
         'statistics' => 'array',
-        'videos' => 'array',
         'published_at' => 'datetime',
         'last_synced_at' => 'datetime',
     ];
@@ -30,5 +29,10 @@ class Channel extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
     }
 }
